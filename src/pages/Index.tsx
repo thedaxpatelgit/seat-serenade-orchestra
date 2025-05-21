@@ -269,7 +269,7 @@ const Index = () => {
       {/* Header */}
       <header className="bg-venue-header text-white p-4">
         <div className="container mx-auto">
-          <h1 className="text-2xl font-bold">Venue Seating System</h1>
+          <h1 className="text-2xl font-bold">Cinema Seating System</h1>
           <p className="text-sm opacity-75">Prototype Seating Algorithm</p>
         </div>
       </header>
