@@ -1,0 +1,108 @@
+
+@startuml "Venue Seating System - Activity Diagram"
+skinparam activityBackgroundColor #f0f8ff
+skinparam activityBorderColor #6495ed
+skinparam activityStartColor #90ee90
+skinparam activityEndColor #ff6347
+
+title Venue Seating Algorithm - Activity Flow
+
+|#lightgrey|User|
+|#lightblue|System|
+
+start
+
+:User inputs group requirements;
+note right: Group size (2-7), VIP status, accessibility needs, etc.
+
+|System|
+:Clear Previous Selection;
+
+if (Group Size < 2?) then (yes)
+  :Display Minimum Group Size Warning;
+  |User|
+  :Adjust Group Size;
+  goto UserInput
+else (no)
+  if (Has Elderly Members?) then (yes)
+    :Run findElderlyFriendlySeats Algorithm;
+  else (no)
+    :Run findSeatsForGroup Algorithm;
+  endif
+endif
+
+if (Suitable Seats Found?) then (yes)
+  if (Has Children & Age-Restricted Area?) then (yes)
+    if (Admin Override Active?) then (yes)
+      :Allow Booking in Age-Restricted Area;
+    else (no)
+      :Reject Booking with Age Restriction Warning;
+      |User|
+      :Review Age Restriction Warning;
+      :Modify Requirements or Location;
+      goto ReviewSeats
+    endif
+  else (no)
+    :Display Selected Seats to User;
+  endif
+  
+  |User|
+  :Review Seat Recommendations;
+  label ReviewSeats
+  
+  if (Seats Acceptable?) then (yes)
+    :Confirm Booking;
+    |System|
+    :assignSeatsToGroup;
+    :Update Seating Chart;
+    :Apply No-Single-Seat-Gap Rule;
+    :Create Booking Record;
+    |User|
+    :Receive Booking Confirmation;
+  else (no)
+    :Request Different Seats;
+    |System|
+    goto ClearSelection
+  endif
+else (no)
+  |System|
+  :Display No Available Seats Message;
+  |User|
+  if (Try Different Requirements?) then (yes)
+    :Modify Seating Requirements;
+    goto ClearSelection
+  else (no)
+    stop
+  endif
+endif
+
+label UserInput
+|User|
+if (Need to Cancel or Reschedule?) then (yes)
+  :Select Cancel or Reschedule;
+  |System|
+  if (Reschedule Selected?) then (yes)
+    :Mark Seats for Reallocation;
+    :Run Seat Finding Algorithm Again;
+    goto DisplaySeats
+  else (no)
+    :Cancel Booking;
+    :Return Seats to Available Pool;
+  endif
+else (no)
+  :End Booking Process;
+endif
+
+stop
+
+label ClearSelection
+|System|
+:Clear Previous Selection;
+goto UserInput
+
+label DisplaySeats
+|System|
+:Display Selected Seats to User;
+goto ReviewSeats
+
+@enduml
